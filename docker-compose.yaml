@@ -1,0 +1,16 @@
+version: ""
+
+services:
+
+  minio:
+    image: minio/minio
+    container_name: 'minio'
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./.minio:/data
+    environment:
+      MINIO_ROOT_USER: $S3_ACCESS_KEY
+      MINIO_ROOT_PASSWORD: $S3_ACCESS_SECRET
+    command: server --console-address ":9001" /data

@@ -1,0 +1,49 @@
+[project]
+name = "utility"
+version = "0.1.0"
+description = "CLI application for minio managering."
+readme = "README.md"
+keywords = [
+    "object-storage",
+    "minio",
+    "api",
+    "cli",
+]
+authors = [
+    {name = "Pavel Vaschenko", email="vaschenko@vmk.ru"},
+]
+maintainers = [
+    {name = "Pavel Vaschenko", email="vaschenko@vmk.ru"},
+]
+requires-python = ">=3.12"
+dependencies = [
+    "aiobotocore>=2.25.0",
+    "aiofiles>=25.1.0",
+    "pydantic>=2.12.2",
+    "pydantic-settings>=2.11.0",
+]
+
+[dependency-groups]
+linting = [
+    "ruff>=0.14.1",
+]
+testing = [
+    "minio>=7.2.18",
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.2",
+    "pytest-cov>=6.0.0",
+    "pytest-faker>=2.0.0",
+    "pytest-randomly>=3.16.0",
+    "testcontainers>=4.13.2",
+]
+dev = [
+    {include-group = "linting"},
+    {include-group = "testing"},
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
