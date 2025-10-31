@@ -14,7 +14,9 @@ from pydantic import SecretStr
 from utility.managers.exceptions import (
     BucketNameInvalidError,
     CreateBucketError,
+    ObjectError,
     RemoveBucketError,
+    RemoveObjectError,
 )
 
 
@@ -50,7 +52,7 @@ class ObjectStorageManager:
         region_name: str,
         endpoint_url: str,
         certificate_verify: str,
-        chunk_size: int = 8*1024*1024,
+        chunk_size: int = 64*1024*1024,
         max_workers: int = 10,
     ) -> None:
 
@@ -81,7 +83,7 @@ class ObjectStorageManager:
                 client.exceptions.BucketAlreadyOwnedByYou,
             ) as error:
                 LOGGER.error(
-                    'Creating a bucket is failed. Bucket already exists',
+                    'Creating a bucket failed: bucket already exists',
                     extra=dict(
                         bucket_name=bucket_name,
                         error=str(error),
@@ -93,7 +95,7 @@ class ObjectStorageManager:
                 botocore.exceptions.ParamValidationError,
             ) as error:
                 LOGGER.error(
-                    'Creating a bucket is failed',
+                    'Creating a bucket failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         error=str(error),
@@ -102,7 +104,7 @@ class ObjectStorageManager:
                 raise BucketNameInvalidError from error
             except Exception as error:
                 LOGGER.error(
-                    'Creating a bucket is failed',
+                    'Creating a bucket failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         error=str(error),
@@ -130,7 +132,7 @@ class ObjectStorageManager:
                 )
             except client.exceptions.NoSuchBucket as error:
                 LOGGER.error(
-                    'Removing a bucket is failed. Bucket is not exists',
+                    'Removing a bucket failed. Bucket is not exists',
                     extra=dict(
                         bucket_name=bucket_name,
                         error=str(error),
@@ -139,7 +141,7 @@ class ObjectStorageManager:
                 raise RemoveBucketError from error
             except Exception as error:
                 LOGGER.error(
-                    'Removing a bucket is failed',
+                    'Removing a bucket failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         error=str(error),
@@ -204,7 +206,7 @@ class ObjectStorageManager:
                 )
             except Exception as error:
                 LOGGER.error(
-                    'Setting policy for a bucket is failed',
+                    'Setting policy for a bucket failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         policy=policy.value,
@@ -249,13 +251,19 @@ class ObjectStorageManager:
         async with self.get_client() as client:
 
             try:
-                await client.delete_object(
+                response = await client.delete_object(
                     Bucket=bucket_name,
                     Key=object_key,
                 )
+
+                status = response['ResponseMetadata']['HTTPStatusCode']
+                if status != 204:
+                    raise RemoveObjectError(
+                        msg=json.dumps(response['ResponseMetadata']),
+                    )
             except Exception as error:
                 LOGGER.error(
-                    'Deleting an object is failed',
+                    'Deleting an object failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         object_key=object_key,
@@ -291,7 +299,7 @@ class ObjectStorageManager:
                 )
             except Exception as error:
                 LOGGER.error(
-                    'Uploading an object is failed',
+                    'Uploading an object failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         object_key=object_key,
@@ -357,7 +365,7 @@ class ObjectStorageManager:
                 )
             except Exception as error:
                 LOGGER.info(
-                    'Uploading a object is failed',
+                    'Uploading a object failed',
                     extra=dict(
                         bucket_name=bucket_name,
                         object_key=object_key,

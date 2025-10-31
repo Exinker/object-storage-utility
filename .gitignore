@@ -1,9 +1,12 @@
 __pycache__/
+.archive/
 .git/
+.source/
 .venv/
 .vscode/
 
 *.egg-info
+.*.py
 .DS_Store
 .env
 .log*

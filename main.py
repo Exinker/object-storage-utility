@@ -15,36 +15,36 @@ object_key = fake.file_path(
     extension='dat',
 )
 object_data = fake.binary(
-    length=4*1024*1024*1024,
+    length=4*1024*1024,
 )
 
 
 async def main():
 
-    client = ObjectStorageManager(
+    manager = ObjectStorageManager(
         access_key=S3_CONFIG.access_key,
         secret_key=S3_CONFIG.secret_key,
         region_name=S3_CONFIG.region_name,
         endpoint_url=S3_CONFIG.endpoint_url,
         certificate_verify=S3_CONFIG.certificate_verify,
     )
-    # await client.create_bucket(
+    # await manager.create_bucket(
     #     bucket_name=bucket_name,
     # )
-    await client.upload_object(
+    await manager.upload_object(
         bucket_name=bucket_name,
         object_key=object_key,
         object_data=object_data,
     )
-    await client.download_object(
+    # await manager.download_object(
+    #     bucket_name=bucket_name,
+    #     object_key=object_key,
+    # )
+    await manager.remove_object(
         bucket_name=bucket_name,
         object_key=object_key,
     )
-    await client.remove_object(
-        bucket_name=bucket_name,
-        object_key=object_key,
-    )
-    # await client.remove_bucket(
+    # await manager.remove_bucket(
     #     bucket_name=bucket_name,
     # )
 

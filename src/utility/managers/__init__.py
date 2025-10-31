@@ -1,3 +1,4 @@
+from .archive_manager import ArchiveManager
 from .object_storage_manager import (
     ObjectStorageManager,
     Policy,
@@ -5,6 +6,7 @@ from .object_storage_manager import (
 
 
 __all__ = [
+    ArchiveManager,
     ObjectStorageManager,
     Policy,
 ]
